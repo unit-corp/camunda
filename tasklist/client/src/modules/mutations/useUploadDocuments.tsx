@@ -14,7 +14,7 @@ type Payload = {
   files: Map<string, File[]>;
 };
 
-type FileUploadResponse = {
+type FileUploadMetadata = {
   documentType: string;
   storeId: string;
   documentId: string;
@@ -27,29 +27,27 @@ type FileUploadResponse = {
 
 function useUploadDocuments() {
   return useMutation<
-    Map<string, FileUploadResponse[]>,
+    Map<string, FileUploadMetadata[]>,
     RequestError | Error,
     Payload
   >({
     mutationFn: async ({files}) => {
       const requests: ReturnType<typeof request>[] = [];
-      const fileRequestMapping = files
-        .entries()
-        .map<
-          [string, Promise<Awaited<ReturnType<typeof request>>[]>]
-        >(([key, files]) => {
-          const itemRequests = files.map((file) =>
-            request(api.uploadDocuments({file})),
-          );
+      const fileRequestMapping = Array.from(files.entries()).map<
+        [string, Promise<Awaited<ReturnType<typeof request>>[]>]
+      >(([key, files]) => {
+        const itemRequests = files.map((file) =>
+          request(api.uploadDocuments({file})),
+        );
 
-          requests.push(...itemRequests);
+        requests.push(...itemRequests);
 
-          return [key, Promise.all(itemRequests)];
-        });
+        return [key, Promise.all(itemRequests)];
+      });
       const responses = await Promise.all(requests);
 
       if (responses.every(({response}) => response !== null)) {
-        const metadataMapping: [string, FileUploadResponse[]][] = [];
+        const metadataMapping: [string, FileUploadMetadata[]][] = [];
 
         for (const [key, responses] of fileRequestMapping) {
           const metadata = await responses;
@@ -69,3 +67,4 @@ function useUploadDocuments() {
 }
 
 export {useUploadDocuments};
+export type {FileUploadMetadata};
