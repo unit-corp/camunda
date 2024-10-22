@@ -10,9 +10,10 @@ import {get} from 'request';
 import {formatters} from 'services';
 
 export interface Identity {
-  id: string;
-  name: string;
+  id: string | null;
+  name: string | null;
   email?: string;
+  type?: string;
 }
 
 export interface User {
