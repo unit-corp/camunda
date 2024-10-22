@@ -11,6 +11,7 @@ import io.camunda.db.rdbms.write.queue.ExecutionQueue;
 import io.camunda.db.rdbms.write.service.ExporterPositionService;
 import io.camunda.db.rdbms.write.service.ProcessDefinitionWriter;
 import io.camunda.db.rdbms.write.service.ProcessInstanceWriter;
+import io.camunda.db.rdbms.write.service.UserTaskWriter;
 import io.camunda.db.rdbms.write.service.VariableWriter;
 
 public class RdbmsWriter {
@@ -20,6 +21,7 @@ public class RdbmsWriter {
   private final ProcessDefinitionWriter processDefinitionWriter;
   private final ProcessInstanceWriter processInstanceWriter;
   private final VariableWriter variableWriter;
+  private final UserTaskWriter userTaskWriter;
 
   public RdbmsWriter(
       final ExecutionQueue executionQueue, final ExporterPositionService exporterPositionService) {
@@ -28,6 +30,7 @@ public class RdbmsWriter {
     processDefinitionWriter = new ProcessDefinitionWriter(executionQueue);
     processInstanceWriter = new ProcessInstanceWriter(executionQueue);
     variableWriter = new VariableWriter(executionQueue);
+    userTaskWriter = new UserTaskWriter(executionQueue);
   }
 
   public ProcessDefinitionWriter getProcessDefinitionWriter() {
@@ -40,6 +43,10 @@ public class RdbmsWriter {
 
   public VariableWriter getVariableWriter() {
     return variableWriter;
+  }
+
+  public UserTaskWriter getUserTaskWriter() {
+    return userTaskWriter;
   }
 
   public ExporterPositionService getExporterPositionService() {

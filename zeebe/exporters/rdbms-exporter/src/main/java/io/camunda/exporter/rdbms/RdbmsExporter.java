@@ -119,13 +119,22 @@ public class RdbmsExporter implements Exporter {
   private void registerHandler() {
     if (partitionId == PROCESS_DEFINITION_PARTITION) {
       registeredHandlers.put(
-          ValueType.PROCESS, new ProcessExportHandler(rdbmsWriter.getProcessDefinitionWriter()));
+          ValueType.PROCESS,
+          new ProcessExportHandler(rdbmsWriter.getProcessDefinitionWriter())
+      );
     }
     registeredHandlers.put(
         ValueType.PROCESS_INSTANCE,
-        new ProcessInstanceExportHandler(rdbmsWriter.getProcessInstanceWriter()));
+        new ProcessInstanceExportHandler(rdbmsWriter.getProcessInstanceWriter())
+    );
     registeredHandlers.put(
-        ValueType.VARIABLE, new VariableExportHandler(rdbmsWriter.getVariableWriter()));
+        ValueType.VARIABLE,
+        new VariableExportHandler(rdbmsWriter.getVariableWriter())
+    );
+    registeredHandlers.put(
+        ValueType.USER_TASK,
+        new UserTaskExportHandler(rdbmsWriter.getUserTaskWriter())
+    );
   }
 
   private void updatePositionInBroker() {

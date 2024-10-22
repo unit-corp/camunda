@@ -10,6 +10,7 @@ package io.camunda.application.commons.rdbms;
 import io.camunda.db.rdbms.sql.ExporterPositionMapper;
 import io.camunda.db.rdbms.sql.ProcessDefinitionMapper;
 import io.camunda.db.rdbms.sql.ProcessInstanceMapper;
+import io.camunda.db.rdbms.sql.UserTaskMapper;
 import io.camunda.db.rdbms.sql.VariableMapper;
 import java.io.IOException;
 import java.util.Properties;
@@ -89,6 +90,12 @@ public class MyBatisConfiguration {
   public MapperFactoryBean<VariableMapper> variableMapper(
       final SqlSessionFactory sqlSessionFactory) {
     return createMapperFactoryBean(sqlSessionFactory, VariableMapper.class);
+  }
+
+  @Bean
+  public MapperFactoryBean<UserTaskMapper> userTaskMapper(
+      final SqlSessionFactory sqlSessionFactory) {
+    return createMapperFactoryBean(sqlSessionFactory, UserTaskMapper.class);
   }
 
   @Bean

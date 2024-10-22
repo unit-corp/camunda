@@ -10,10 +10,12 @@ package io.camunda.application.commons.rdbms;
 import io.camunda.db.rdbms.RdbmsService;
 import io.camunda.db.rdbms.read.service.ProcessDefinitionReader;
 import io.camunda.db.rdbms.read.service.ProcessInstanceReader;
+import io.camunda.db.rdbms.read.service.UserTaskReader;
 import io.camunda.db.rdbms.read.service.VariableReader;
 import io.camunda.db.rdbms.sql.ExporterPositionMapper;
 import io.camunda.db.rdbms.sql.ProcessDefinitionMapper;
 import io.camunda.db.rdbms.sql.ProcessInstanceMapper;
+import io.camunda.db.rdbms.sql.UserTaskMapper;
 import io.camunda.db.rdbms.sql.VariableMapper;
 import io.camunda.db.rdbms.write.RdbmsWriterFactory;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -45,6 +47,12 @@ public class RdbmsConfiguration {
   }
 
   @Bean
+  public UserTaskReader variableRdbmsReader(
+      final UserTaskMapper userTaskMapper) {
+    return new UserTaskReader(userTaskMapper);
+  }
+
+  @Bean
   public RdbmsWriterFactory rdbmsWriterFactory(
       final SqlSessionFactory sqlSessionFactory,
       final ExporterPositionMapper exporterPositionMapper) {
@@ -56,8 +64,9 @@ public class RdbmsConfiguration {
       final RdbmsWriterFactory rdbmsWriterFactory,
       final VariableReader variableReader,
       final ProcessDefinitionReader processDefinitionReader,
-      final ProcessInstanceReader processInstanceReader) {
+      final ProcessInstanceReader processInstanceReader,
+      final UserTaskReader userTaskReader) {
     return new RdbmsService(
-        rdbmsWriterFactory, processDefinitionReader, processInstanceReader, variableReader);
+        rdbmsWriterFactory, processDefinitionReader, processInstanceReader, variableReader, userTaskReader);
   }
 }

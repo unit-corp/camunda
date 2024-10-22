@@ -5,17 +5,15 @@
  * Licensed under the Camunda License 1.0. You may not use this file
  * except in compliance with the Camunda License 1.0.
  */
-package io.camunda.exporter.rdbms;
+package io.camunda.db.rdbms.sql;
 
-import java.time.Instant;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import io.camunda.db.rdbms.write.domain.UserTaskDbModel;
 
-public final class DateUtil {
+public interface UserTaskMapper {
 
-  private DateUtil() {}
+  void insert(UserTaskDbModel variable);
 
-  public static OffsetDateTime toOffsetDateTime(final Long timestamp) {
-    return OffsetDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneOffset.UTC);
-  }
+  void update(UserTaskDbModel variable);
+
+  UserTaskDbModel findOne(Long key);
 }

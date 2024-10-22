@@ -9,6 +9,7 @@ package io.camunda.db.rdbms;
 
 import io.camunda.db.rdbms.read.service.ProcessDefinitionReader;
 import io.camunda.db.rdbms.read.service.ProcessInstanceReader;
+import io.camunda.db.rdbms.read.service.UserTaskReader;
 import io.camunda.db.rdbms.read.service.VariableReader;
 import io.camunda.db.rdbms.write.RdbmsWriter;
 import io.camunda.db.rdbms.write.RdbmsWriterFactory;
@@ -20,16 +21,19 @@ public class RdbmsService {
   private final ProcessDefinitionReader processDefinitionReader;
   private final ProcessInstanceReader processInstanceReader;
   private final VariableReader variableReader;
+  private final UserTaskReader userTaskReader;
 
   public RdbmsService(
       final RdbmsWriterFactory rdbmsWriterFactory,
       final ProcessDefinitionReader processDefinitionReader,
       final ProcessInstanceReader processInstanceReader,
-      final VariableReader variableReader) {
+      final VariableReader variableReader,
+      final UserTaskReader userTaskReader) {
     this.rdbmsWriterFactory = rdbmsWriterFactory;
     this.processDefinitionReader = processDefinitionReader;
     this.processInstanceReader = processInstanceReader;
     this.variableReader = variableReader;
+    this.userTaskReader = userTaskReader;
   }
 
   public ProcessDefinitionReader getProcessDefinitionReader() {
@@ -42,6 +46,10 @@ public class RdbmsService {
 
   public VariableReader getVariableReader() {
     return variableReader;
+  }
+
+  public UserTaskReader getUserTaskReader() {
+    return userTaskReader;
   }
 
   public RdbmsWriter createWriter(final long partitionId) {
