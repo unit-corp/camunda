@@ -12,4 +12,5 @@ public enum ContextType {
   PROCESS_DEFINITION,
   PROCESS_INSTANCE,
   VARIABLE,
+  USER_TASK
 }

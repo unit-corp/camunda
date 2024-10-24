@@ -24,7 +24,7 @@ public class UserTaskWriter {
   public void create(final UserTaskDbModel userTaskDbModel) {
     executionQueue.executeInQueue(
         new QueueItem(
-            ContextType.VARIABLE,
+            ContextType.USER_TASK,
             userTaskDbModel.key(),
             "io.camunda.db.rdbms.sql.VariableMapper.insert",
             userTaskDbModel));
@@ -33,7 +33,7 @@ public class UserTaskWriter {
   public void update(final UserTaskDbModel userTaskDbModel) {
     executionQueue.executeInQueue(
         new QueueItem(
-            ContextType.VARIABLE,
+            ContextType.USER_TASK,
             userTaskDbModel.key(),
             "io.camunda.db.rdbms.sql.VariableMapper.update",
             userTaskDbModel));

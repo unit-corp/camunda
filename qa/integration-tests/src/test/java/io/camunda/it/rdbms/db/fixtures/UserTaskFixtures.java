@@ -10,6 +10,7 @@ package io.camunda.it.rdbms.db.fixtures;
 import io.camunda.db.rdbms.RdbmsService;
 import io.camunda.db.rdbms.write.RdbmsWriter;
 import io.camunda.db.rdbms.write.domain.UserTaskDbModel;
+import io.camunda.db.rdbms.write.domain.UserTaskDbModel.Builder;
 import java.util.List;
 import java.util.function.Function;
 
@@ -22,9 +23,9 @@ public final class UserTaskFixtures extends CommonFixtures {
   }
 
   public static UserTaskDbModel createRandomized(
-      final Function<UserTaskDbModelBuilder, UserTaskDbModelBuilder> builderFunction) {
+      final Function<Builder, Builder> builderFunction) {
     final var builder =
-        new UserTaskDbModelBuilder()
+        new Builder()
             .key(nextKey())
             .processInstanceKey(nextKey())
             .scopeKey(nextKey())
@@ -41,7 +42,7 @@ public final class UserTaskFixtures extends CommonFixtures {
 
   public static void createAndSaveRandomUserTasks(
       final RdbmsService rdbmsService,
-      final Function<UserTaskDbModelBuilder, UserTaskDbModelBuilder> builderFunction) {
+      final Function<Builder, Builder> builderFunction) {
     final RdbmsWriter rdbmsWriter = rdbmsService.createWriter(0L);
     for (int i = 0; i < 20; i++) {
       rdbmsWriter.getUserTaskWriter().create(UserTaskFixtures.createRandomized(builderFunction));

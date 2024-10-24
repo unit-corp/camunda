@@ -10,8 +10,12 @@ package io.camunda.db.rdbms.read.service;
 import io.camunda.db.rdbms.sql.UserTaskMapper;
 import io.camunda.db.rdbms.write.domain.UserTaskDbModel;
 import io.camunda.db.rdbms.write.domain.VariableDbModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UserTaskReader {
+
+  private static final Logger LOG = LoggerFactory.getLogger(UserTaskReader.class);
 
   private final UserTaskMapper userTaskMapper;
 
@@ -20,6 +24,8 @@ public class UserTaskReader {
   }
 
   public UserTaskDbModel findOne(final Long key) {
+    LOG.trace("[RDBMS DB] Search for process instance with key {}", key);
+
     return userTaskMapper.findOne(key);
   }
 }
