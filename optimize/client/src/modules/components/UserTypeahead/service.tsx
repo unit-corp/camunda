@@ -50,13 +50,17 @@ export function getUserId(id: string | null): string {
 }
 
 export function itemToString(item: Item | null): string {
-  if (!item) return '';
+  if (!item) {
+    return '';
+  }
   const {label, subText, id} = item;
   return label || subText || id;
 }
 
 export function itemToElement(item: Item | null, textValue: string): JSX.Element {
-  if (!item) return <></>;
+  if (!item) {
+    return <></>;
+  }
 
   if (item.id === 'loading') {
     return <p className="cds--checkbox-label-text cds--skeleton" />;
