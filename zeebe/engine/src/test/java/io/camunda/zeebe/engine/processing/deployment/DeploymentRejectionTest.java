@@ -279,10 +279,11 @@ public class DeploymentRejectionTest {
   }
 
   @Test
-  public void shouldRejectDeploymentIfTargetResourceNotIncludedForBindingTypeDeployment() {
+  public void
+      shouldRejectDeploymentIfCalledProcessNotIncludedForCallActivityWithBindingTypeDeployment() {
     // given
-    final var process1 =
-        Bpmn.createExecutableProcess("process-1")
+    final var process =
+        Bpmn.createExecutableProcess("process")
             .startEvent()
             .callActivity(
                 "callActivity",
@@ -290,6 +291,36 @@ public class DeploymentRejectionTest {
                     builder
                         .zeebeBindingType(ZeebeBindingType.deployment)
                         .zeebeProcessId("test-process"))
+            .endEvent()
+            .done();
+
+    // when
+    final var rejectedDeployment =
+        ENGINE.deployment().withXmlResource("process.bpmn", process).expectRejection().deploy();
+
+    // then
+    Assertions.assertThat(rejectedDeployment)
+        .hasKey(ExecuteCommandResponseDecoder.keyNullValue())
+        .hasRecordType(RecordType.COMMAND_REJECTION)
+        .hasIntent(DeploymentIntent.CREATE)
+        .hasRejectionType(RejectionType.INVALID_ARGUMENT);
+    assertThat(rejectedDeployment.getRejectionReason())
+        .isEqualTo(
+            """
+            Expected to deploy new resources, but encountered the following errors:
+            'process.bpmn':
+            - Element: callActivity > extensionElements > calledElement
+                - ERROR: Expected to find process with id 'test-process' in current deployment, but not found.
+            """);
+  }
+
+  @Test
+  public void
+      shouldRejectDeploymentIfCalledDecisionNotIncludedForBusinessRuleTaskWithBindingTypeDeployment() {
+    // given
+    final var process =
+        Bpmn.createExecutableProcess("process")
+            .startEvent()
             .businessRuleTask(
                 "businessRuleTask",
                 builder ->
@@ -299,8 +330,32 @@ public class DeploymentRejectionTest {
                         .zeebeResultVariable("foo"))
             .endEvent()
             .done();
-    final var process2 =
-        Bpmn.createExecutableProcess("process-2")
+
+    // when
+    final var rejectedDeployment =
+        ENGINE.deployment().withXmlResource("process.bpmn", process).expectRejection().deploy();
+
+    // then
+    Assertions.assertThat(rejectedDeployment)
+        .hasKey(ExecuteCommandResponseDecoder.keyNullValue())
+        .hasRecordType(RecordType.COMMAND_REJECTION)
+        .hasIntent(DeploymentIntent.CREATE)
+        .hasRejectionType(RejectionType.INVALID_ARGUMENT);
+    assertThat(rejectedDeployment.getRejectionReason())
+        .isEqualTo(
+            """
+            Expected to deploy new resources, but encountered the following errors:
+            'process.bpmn':
+            - Element: businessRuleTask > extensionElements > calledDecision
+                - ERROR: Expected to find decision with id 'test-decision' in current deployment, but not found.
+            """);
+  }
+
+  @Test
+  public void shouldRejectDeploymentIfLinkedFormNotIncludedForUserTaskWithBindingTypeDeployment() {
+    // given
+    final var process =
+        Bpmn.createExecutableProcess("process")
             .startEvent()
             .userTask(
                 "userTask",
@@ -308,6 +363,53 @@ public class DeploymentRejectionTest {
                     builder
                         .zeebeFormBindingType(ZeebeBindingType.deployment)
                         .zeebeFormId("test-form"))
+            .endEvent()
+            .done();
+
+    // when
+    final var rejectedDeployment =
+        ENGINE.deployment().withXmlResource("process.bpmn", process).expectRejection().deploy();
+
+    // then
+    Assertions.assertThat(rejectedDeployment)
+        .hasKey(ExecuteCommandResponseDecoder.keyNullValue())
+        .hasRecordType(RecordType.COMMAND_REJECTION)
+        .hasIntent(DeploymentIntent.CREATE)
+        .hasRejectionType(RejectionType.INVALID_ARGUMENT);
+    assertThat(rejectedDeployment.getRejectionReason())
+        .isEqualTo(
+            """
+            Expected to deploy new resources, but encountered the following errors:
+            'process.bpmn':
+            - Element: userTask > extensionElements > formDefinition
+                - ERROR: Expected to find form with id 'test-form' in current deployment, but not found.
+            """);
+  }
+
+  @Test
+  public void
+      shouldRejectDeploymentIfTargetResourceNotIncludedForBindingTypeDeploymentInAnyProcess() {
+    // given
+    final var process1 =
+        Bpmn.createExecutableProcess("process-1")
+            .startEvent()
+            .callActivity(
+                "callActivity1",
+                builder ->
+                    builder
+                        .zeebeBindingType(ZeebeBindingType.deployment)
+                        .zeebeProcessId("test-process-1"))
+            .endEvent()
+            .done();
+    final var process2 =
+        Bpmn.createExecutableProcess("process-2")
+            .startEvent()
+            .callActivity(
+                "callActivity2",
+                builder ->
+                    builder
+                        .zeebeBindingType(ZeebeBindingType.deployment)
+                        .zeebeProcessId("test-process-2"))
             .endEvent()
             .done();
 
@@ -327,29 +429,70 @@ public class DeploymentRejectionTest {
         .hasIntent(DeploymentIntent.CREATE)
         .hasRejectionType(RejectionType.INVALID_ARGUMENT);
     assertThat(rejectedDeployment.getRejectionReason())
+        .isEqualTo(
+            """
+            Expected to deploy new resources, but encountered the following errors:
+            'process 1.bpmn':
+            - Element: callActivity1 > extensionElements > calledElement
+                - ERROR: Expected to find process with id 'test-process-1' in current deployment, but not found.
+
+            'process 2.bpmn':
+            - Element: callActivity2 > extensionElements > calledElement
+                - ERROR: Expected to find process with id 'test-process-2' in current deployment, but not found.
+            """);
+  }
+
+  @Test
+  public void
+      shouldRejectDeploymentIfTargetResourceNotIncludedForBindingTypeDeploymentInMultipleElements() {
+    // given
+    final var process =
+        Bpmn.createExecutableProcess("process")
+            .startEvent()
+            .callActivity(
+                "callActivity",
+                builder ->
+                    builder
+                        .zeebeBindingType(ZeebeBindingType.deployment)
+                        .zeebeProcessId("test-process"))
+            .businessRuleTask(
+                "businessRuleTask",
+                builder ->
+                    builder
+                        .zeebeBindingType(ZeebeBindingType.deployment)
+                        .zeebeCalledDecisionId("test-decision")
+                        .zeebeResultVariable("foo"))
+            .endEvent()
+            .done();
+
+    // when
+    final var rejectedDeployment =
+        ENGINE.deployment().withXmlResource("process.bpmn", process).expectRejection().deploy();
+
+    // then
+    Assertions.assertThat(rejectedDeployment)
+        .hasKey(ExecuteCommandResponseDecoder.keyNullValue())
+        .hasRecordType(RecordType.COMMAND_REJECTION)
+        .hasIntent(DeploymentIntent.CREATE)
+        .hasRejectionType(RejectionType.INVALID_ARGUMENT);
+    assertThat(rejectedDeployment.getRejectionReason())
         .startsWith("Expected to deploy new resources, but encountered the following errors:")
         // the order of the element errors for a particular resource is not deterministic, so the
         // assertion checks that one of the possible variants is included
         .containsAnyOf(
             """
-            'process 1.bpmn':
+            'process.bpmn':
             - Element: businessRuleTask > extensionElements > calledDecision
                 - ERROR: Expected to find decision with id 'test-decision' in current deployment, but not found.
             - Element: callActivity > extensionElements > calledElement
                 - ERROR: Expected to find process with id 'test-process' in current deployment, but not found.
             """,
             """
-            'process 1.bpmn':
+            'process.bpmn':
             - Element: callActivity > extensionElements > calledElement
                 - ERROR: Expected to find process with id 'test-process' in current deployment, but not found.
             - Element: businessRuleTask > extensionElements > calledDecision
                 - ERROR: Expected to find decision with id 'test-decision' in current deployment, but not found.
-            """)
-        .endsWith(
-            """
-            'process 2.bpmn':
-            - Element: userTask > extensionElements > formDefinition
-                - ERROR: Expected to find form with id 'test-form' in current deployment, but not found.
             """);
   }
 
