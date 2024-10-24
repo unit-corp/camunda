@@ -119,7 +119,9 @@ public final class DeploymentTransformer {
         bpmnResources.add(new BpmnResource(deploymentResource, context));
         success &= createMetadata(deploymentResource, deploymentEvent, context, errors);
       } else {
-        success &= createMetadata(deploymentResource, deploymentEvent, null, errors);
+        success &=
+            createMetadata(
+                deploymentResource, deploymentEvent, new DeploymentResourceContext() {}, errors);
       }
     }
 
