@@ -20,7 +20,7 @@ import {
   getSelectedIdentity,
   Item,
 } from './service';
-import {useLoadIdentities} from './hooks';
+import useLoadIdentities from './useLoadIdentities';
 import {UserInputProps} from './UserTypeahead';
 
 import './MultiUserInput.scss';
@@ -88,7 +88,7 @@ export default function MultiUserInput({
         input.removeEventListener('blur', handleBlur);
       }
     };
-  }, [loadNewValues]);
+  }, [loadNewValues, setLoading]);
 
   function handleSelect(item: Item | null) {
     if (!item) {
@@ -133,7 +133,9 @@ export default function MultiUserInput({
       itemToString={(item) => {
         // This is a workaround to prevent the itemToString from being called with an array
         // This happens on initial render
-        if (Array.isArray(item)) return '';
+        if (Array.isArray(item)) {
+          return '';
+        }
         return itemToString(item);
       }}
       itemToElement={(item) => itemToElement(item, textValue)}
