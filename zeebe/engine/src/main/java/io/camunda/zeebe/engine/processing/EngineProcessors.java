@@ -202,7 +202,8 @@ public final class EngineProcessors {
         writers,
         processingState,
         commandDistributionBehavior,
-        bpmnBehaviors);
+        bpmnBehaviors,
+        authCheckBehavior);
     addSignalBroadcastProcessors(
         typedRecordProcessors,
         bpmnBehaviors,
@@ -434,14 +435,16 @@ public final class EngineProcessors {
       final Writers writers,
       final MutableProcessingState processingState,
       final CommandDistributionBehavior commandDistributionBehavior,
-      final BpmnBehaviors bpmnBehaviors) {
+      final BpmnBehaviors bpmnBehaviors,
+      final AuthorizationCheckBehavior authCheckBehavior) {
     final var resourceDeletionProcessor =
         new ResourceDeletionDeleteProcessor(
             writers,
             processingState.getKeyGenerator(),
             processingState,
             commandDistributionBehavior,
-            bpmnBehaviors);
+            bpmnBehaviors,
+            authCheckBehavior);
     typedRecordProcessors.onCommand(
         ValueType.RESOURCE_DELETION, ResourceDeletionIntent.DELETE, resourceDeletionProcessor);
   }
